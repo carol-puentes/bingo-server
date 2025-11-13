@@ -10,8 +10,7 @@ app.get("/", (req, res) => res.send("Bingo server is running"));
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "https://bingo-emaus.netlify.app"],
-    
+    origin: ["http://localhost:5173"],
     methods: ["GET", "POST"],
   },
 });
@@ -120,7 +119,9 @@ io.on("connection", (socket) => {
     // Si es un bingo correcto, avisamos a todos los jugadores
     io.to(roomId).emit("winner", playerName);
     console.log(`🏆 ${playerName} hizo BINGO válido en ${roomId}`);
-  } else {
+  } 
+  
+  else {
     // Si no es válido, solo avisamos al jugador que intentó
     socket.emit("invalid-bingo");
     console.log(`❌ ${playerName} intentó un bingo inválido en ${roomId}`);
@@ -186,25 +187,37 @@ function getLetterForNumber(num) {
 
 
 
+// function validateBingo(card, calledNumbers) {
+//   const marked = card.map((row) =>
+//     row.map((num) => num === "FREE" || calledNumbers.includes(num))
+//   );
+
+//   // filas
+//   for (let row of marked) {
+//     if (row.every((v) => v)) return true;
+//   }
+//   // columnas
+//   for (let c = 0; c < 5; c++) {
+//     if (marked.every((row) => row[c])) return true;
+//   }
+//   // diagonales
+//   if ([0, 1, 2, 3, 4].every((i) => marked[i][i])) return true;
+//   if ([0, 1, 2, 3, 4].every((i) => marked[i][4 - i])) return true;
+
+//   return false;
+// }
+
+
 function validateBingo(card, calledNumbers) {
   const marked = card.map((row) =>
     row.map((num) => num === "FREE" || calledNumbers.includes(num))
   );
 
-  // filas
-  for (let row of marked) {
-    if (row.every((v) => v)) return true;
-  }
-  // columnas
-  for (let c = 0; c < 5; c++) {
-    if (marked.every((row) => row[c])) return true;
-  }
-  // diagonales
-  if ([0, 1, 2, 3, 4].every((i) => marked[i][i])) return true;
-  if ([0, 1, 2, 3, 4].every((i) => marked[i][4 - i])) return true;
-
-  return false;
+  // FULL CARD — todas las casillas marcadas
+  return marked.every((row) => row.every((v) => v));
 }
 
 
+
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
